@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ros_distro_variant=$1
+ros_distro=$1
 container_name=$2
 
 # Stop and remove existing container
@@ -15,7 +15,7 @@ export USER_GID=$(id -g)
 export USERNAME=$USER
 export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
 
-echo "🔧 Building minimal ROS 2 Docker image..."
+echo "🔧 Building ROS 2 Docker image..."
 
 #  3. Create Docker network for ROS2 containers
 # echo "🌐 Creating ROS2 network..."
@@ -24,8 +24,8 @@ echo "🔧 Building minimal ROS 2 Docker image..."
 #  4. Build and run Docker container 
 echo "🔨 Building ROS 2 Docker image..."
 # Build the Docker image with platform specification and build args
-docker build
-  --build-arg BASE_VARIANT=${ros_distro_variant} \
+docker build \
+  --build-arg ROS_DISTRO=$ros_distro \
   --build-arg USER_UID=${USER_UID} \
   --build-arg USER_GID=${USER_GID} \
   --build-arg USERNAME=${USERNAME} \

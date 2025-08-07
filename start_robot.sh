@@ -1,1 +1,1 @@
-./build_and_run.sh base camerabot
+./build_and_run.sh jazzy-ros-base camerabot

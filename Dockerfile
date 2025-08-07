@@ -1,5 +1,5 @@
-ARG BASE_VARIANT=desktop
-FROM ros:jazzy-ros-${BASE_VARIANT}
+ARG ROS_DISTRO
+FROM ros:${ROS_DISTRO}
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 

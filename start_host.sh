@@ -1,1 +1,1 @@
-./build_and_run.sh desktop camerabot_host
+./build_and_run.sh jazzy camerabot_host
