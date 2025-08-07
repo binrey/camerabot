@@ -28,6 +28,8 @@ setup(
             'my_robot_driver = my_package.my_robot_driver:main',
             'obstacle_avoider = my_package.obstacle_avoider:main',
             'openai_api = my_package.opeai_api:main',
+            'talker = my_package.talker:main',
+            'listener = my_package.listener:main',
         ],
     },
 )
