@@ -1,46 +1,51 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-#  1. Sanity checks 
-ARCH=$(uname -m)
-if [[ "$ARCH" != "aarch64" ]]; then
-  echo "❌  This script targets 64-bit Raspberry Pi boards (aarch64)."
-  exit 1
-fi
+ros_distro_variant=$1
+container_name=$2
+
+# Stop and remove existing container
+echo "🛑 Stopping existing container..."
+docker stop $container_name 2>/dev/null || true
+docker rm $container_name 2>/dev/null || true
 
 #  2. Set environment variables 
 export USER_UID=$(id -u)
 export USER_GID=$(id -g)
 export USERNAME=$USER
+export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
 
-#  3. Build and run Docker container 
+echo "🔧 Building minimal ROS 2 Docker image..."
+
+#  3. Create Docker network for ROS2 containers
+# echo "🌐 Creating ROS2 network..."
+# docker network create camerabot_network 2>/dev/null || echo "Network already exists"
+
+#  4. Build and run Docker container 
 echo "🔨 Building ROS 2 Docker image..."
 # Build the Docker image with platform specification and build args
-docker build --platform linux/arm64 \
+docker build
+  --build-arg BASE_VARIANT=${ros_distro_variant} \
   --build-arg USER_UID=${USER_UID} \
   --build-arg USER_GID=${USER_GID} \
   --build-arg USERNAME=${USERNAME} \
   -t ros2_jazzy .
 
 echo "🚀 Starting ROS 2 container..."
-# Run the container with all the configuration from docker-compose.yml
+# Run the container with network configuration
 docker run -d \
-  --name ros2_jazzy \
-  --network host \
+  --name $container_name \
   --tty \
   --interactive \
-  --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  --network host \
+  --env ROS_DOMAIN_ID=${ROS_DOMAIN_ID} \
   --volume .:/home/$USERNAME:rw \
-  --volume ~/.Xauthority:/home/rosuser/.Xauthority:rw \
   --user "${USER_UID}:${USER_GID}" \
   ros2_jazzy \
   bash
 
 echo -e "\n✅  Done!  Try it out:\n"
-echo "   docker exec -it ros2_jazzy bash"
+echo "   docker exec -it $container_name bash"
 echo "   # inside container:"
 echo "   source /opt/ros/jazzy/setup.sh"
-echo "   ros2 run demo_nodes_cpp talker"
-echo ""
-echo "To stop the container:"
-echo "   docker stop ros2_jazzy && docker rm ros2_jazzy" 
+echo "   source install/local_setup.bash"
