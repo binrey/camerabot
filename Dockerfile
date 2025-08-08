@@ -1,4 +1,4 @@
-ARG ROS_DISTRO
+ARG ROS_DISTRO=jazzy
 FROM ros:${ROS_DISTRO}
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -10,30 +10,46 @@ ARG USER_UID
 ARG USER_GID
 
 # Install ROS 2 Jazzy (for webots)
-RUN apt-get update && apt-get install -y ros-jazzy-vision-msgs
+RUN apt-get update && apt-get install -y \
+    ros-jazzy-vision-msgs \
+    ros-jazzy-ros2-control \
+    ros-jazzy-hardware-interface \
+    ros-jazzy-controller-manager
 
-# Create user and group with proper handling of existing groups
+# Create user and group with proper handling of existing users and groups
 RUN if getent group $USER_GID > /dev/null 2>&1; then \
-        # Group exists, use it and modify if needed
-        groupmod -n $USERNAME $(getent group $USER_GID | cut -d: -f1); \
+        # Group exists, check if it's the right name
+        existing_group=$(getent group $USER_GID | cut -d: -f1); \
+        if [ "$existing_group" != "$USERNAME" ]; then \
+            groupmod -n $USERNAME $existing_group; \
+        fi; \
     else \
         # Group doesn't exist, create it
         groupadd -g $USER_GID $USERNAME; \
     fi \
-    && useradd -u $USER_UID -g $USER_GID -m $USERNAME \
+    && if getent passwd $USER_UID > /dev/null 2>&1; then \
+        # User exists, modify it to match our requirements
+        existing_user=$(getent passwd $USER_UID | cut -d: -f1); \
+        if [ "$existing_user" != "$USERNAME" ]; then \
+            usermod -l $USERNAME -d /home/$USERNAME -m $existing_user; \
+        fi; \
+        usermod -g $USERNAME $USERNAME; \
+    else \
+        # User doesn't exist, create it
+        useradd -u $USER_UID -g $USER_GID -m $USERNAME; \
+    fi \
     && usermod -aG sudo $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Switch to non-root user
 USER $USERNAME
-WORKDIR /home/$USERNAME
-
+WORKDIR /home/$USERNAME/camerabot
 ENV HOME=/home/$USERNAME
 
 # Create a .bashrc entry to automatically source ROS 2 and navigate to workspace
 RUN echo "source /opt/ros/jazzy/setup.sh" >> ~/.bashrc \
-    && echo "cd /home/$USERNAME" >> ~/.bashrc
+    && echo "cd /home/$USERNAME/camerabot" >> ~/.bashrc
 
 # Set default command
 CMD ["bash"] 

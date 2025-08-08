@@ -39,7 +39,7 @@ docker run -d \
   --interactive \
   --network host \
   --env ROS_DOMAIN_ID=${ROS_DOMAIN_ID} \
-  --volume .:/home/$USERNAME:rw \
+  --volume .:/home/$USERNAME/camerabot:rw \
   --user "${USER_UID}:${USER_GID}" \
   ros2_jazzy \
   bash
