@@ -31,21 +31,24 @@ docker build \
   --build-arg USERNAME=${USERNAME} \
   -t ros2_jazzy .
 
+xhost +local:docker
+
 echo "🚀 Starting ROS 2 container..."
 # Run the container with network configuration
-docker run -d \
+docker run -it \
   --name $container_name \
   --tty \
   --interactive \
   --network host \
   --env ROS_DOMAIN_ID=${ROS_DOMAIN_ID} \
+  --env QT_X11_NO_MITSHM=1 \
+  --device /dev/dri \
+  --env DISPLAY=$DISPLAY \
+  --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume .:/home/$USERNAME/camerabot:rw \
   --user "${USER_UID}:${USER_GID}" \
   ros2_jazzy \
   bash
 
-echo -e "\n✅  Done!  Try it out:\n"
-echo "   docker exec -it $container_name bash"
-echo "   # inside container:"
-echo "   source /opt/ros/jazzy/setup.sh"
+echo -e "\n✅  Done!  Inside container:"
 echo "   source install/local_setup.bash"

@@ -1,7 +1,5 @@
 ARG ROS_DISTRO=jazzy
-FROM ros:${ROS_DISTRO}
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
+FROM ${ROS_DISTRO}
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,13 +7,31 @@ ARG USERNAME
 ARG USER_UID
 ARG USER_GID
 
-# Install ROS 2 Jazzy (for webots)
 RUN apt-get update && apt-get install -y \
-    ros-jazzy-vision-msgs \
-    ros-jazzy-ros2-control \
-    ros-jazzy-hardware-interface \
-    ros-jazzy-controller-manager
+    lsb-release \
+    gnupg2 \
+    libgl1 \
+    libqt5gui5 \
+    libjpeg-dev \
+    libpulse0 \
+    wget \
+    sudo
 
+# 3. Install Webots 2025a
+ARG WEBOTS_VERSION=2025a
+# determine correct URL for .deb
+RUN if echo ${WEBOTS_VERSION} | grep -q nightly; then \
+      WEBOTS_URL="https://github.com/cyberbotics/webots/releases/download/${WEBOTS_VERSION}_amd64.deb"; \
+    else \
+      WEBOTS_URL="https://github.com/cyberbotics/webots/releases/download/R${WEBOTS_VERSION}/webots_${WEBOTS_VERSION}_amd64.deb"; \
+    fi && \
+    wget ${WEBOTS_URL} -O /tmp/webots.deb && \
+    apt-get install -y /tmp/webots.deb && \
+    rm /tmp/webots.deb
+
+
+RUN apt-get update && apt-get install -y ros-humble-webots-ros2
+    
 # Create user and group with proper handling of existing users and groups
 RUN if getent group $USER_GID > /dev/null 2>&1; then \
         # Group exists, check if it's the right name
