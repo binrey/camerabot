@@ -48,7 +48,4 @@ docker run -it \
   --volume .:/home/$USERNAME/camerabot:rw \
   --user "${USER_UID}:${USER_GID}" \
   ros2_jazzy \
-  bash
-
-echo -e "\n✅  Done!  Inside container:"
-echo "   source install/local_setup.bash"
+  bash -c "source install/local_setup.bash && echo ✅  Done! && bash"

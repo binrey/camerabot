@@ -64,7 +64,7 @@ WORKDIR /home/$USERNAME/camerabot
 ENV HOME=/home/$USERNAME
 
 # Create a .bashrc entry to automatically source ROS 2 and navigate to workspace
-RUN echo "source /opt/ros/jazzy/setup.sh" >> ~/.bashrc \
+RUN echo "source /opt/ros/humble/setup.sh" >> ~/.bashrc \
     && echo "cd /home/$USERNAME/camerabot" >> ~/.bashrc
 
 # Set default command
