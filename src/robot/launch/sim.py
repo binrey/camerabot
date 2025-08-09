@@ -11,7 +11,7 @@ from webots_ros2_driver.webots_launcher import WebotsLauncher
 def generate_launch_description():
     package_dir = get_package_share_directory('robot')
     robot_description_path = os.path.join(package_dir, 'resource', 'my_robot.urdf')
-    rviz_config_path = os.path.join(package_dir, 'resource', 'my_robot.rviz')
+    rviz_config_path = os.path.join(package_dir, 'resource', 'default.rviz')
 
     webots = WebotsLauncher(
         world=os.path.join(package_dir, 'worlds', 'my_world.wbt')

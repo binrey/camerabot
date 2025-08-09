@@ -7,7 +7,7 @@ data_files.append(('share/' + package_name + '/launch', ['launch/sim.py']))
 data_files.append(('share/' + package_name + '/launch', ['launch/openai_control_launch.py']))
 data_files.append(('share/' + package_name + '/worlds', ['worlds/my_world.wbt']))
 data_files.append(('share/' + package_name + '/resource', ['resource/my_robot.urdf']))
-data_files.append(('share/' + package_name + '/resource', ['resource/my_robot.rviz']))
+data_files.append(('share/' + package_name + '/resource', ['resource/default.rviz']))
 data_files.append(('share/' + package_name, ['package.xml']))
 
 setup(
