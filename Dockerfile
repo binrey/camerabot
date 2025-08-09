@@ -1,4 +1,4 @@
-ARG ROS_DISTRO=jazzy
+ARG ROS_DISTRO
 FROM ${ROS_DISTRO}
 
 # Set environment variables
