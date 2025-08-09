@@ -15,15 +15,13 @@ export USER_GID=$(id -g)
 export USERNAME=$USER
 export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
 
-echo "🔧 Building ROS 2 Docker image..."
-
 #  3. Create Docker network for ROS2 containers
 # echo "🌐 Creating ROS2 network..."
 # docker network create camerabot_network 2>/dev/null || echo "Network already exists"
 
 #  4. Build and run Docker container 
-echo "🔨 Building ROS 2 Docker image..."
-# Build the Docker image with platform specification and build args
+echo "🔨 Building ROS 2 Docker image for" $ros_distro "..."
+# Build the Docker image with platform with specification and build args
 docker build \
   --build-arg ROS_DISTRO=$ros_distro \
   --build-arg USER_UID=${USER_UID} \
@@ -48,4 +46,4 @@ docker run -it \
   --volume .:/home/$USERNAME/camerabot:rw \
   --user "${USER_UID}:${USER_GID}" \
   ros2_jazzy \
-  bash -c "echo ✅  Done! && echo Next: colcon build && source install/local_setup.bash && bash"
+  bash -c "echo ✅  Done! && echo Next: colcon build && echo source install/local_setup.bash && bash"

@@ -1,5 +1,5 @@
-ARG ROS_DISTRO
-FROM ${ROS_DISTRO}
+ARG ROS_DISTRO="osrf/ros:humble-desktop"
+FROM $ROS_DISTRO
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -62,6 +62,7 @@ RUN if getent group $USER_GID > /dev/null 2>&1; then \
 USER $USERNAME
 WORKDIR /home/$USERNAME/camerabot
 ENV HOME=/home/$USERNAME
+ENV USER=$USERNAME
 
 # Create a .bashrc entry to automatically source ROS 2 and navigate to workspace
 RUN echo "source /opt/ros/humble/setup.sh" >> ~/.bashrc \
