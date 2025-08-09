@@ -24,7 +24,7 @@ def generate_launch_description():
 
     openai_api_node = Node(
         package='robot',
-        executable='openai_api',
+        executable='openai_control',
     )
 
     rviz = Node(

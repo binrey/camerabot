@@ -11,7 +11,8 @@ from collections import deque
 
 
 class OpenAIAPINode(Node):
-    def __init__(self):
+    def __init__(self, linear_speed_constant=0.05):
+        self.linear_speed_constant = linear_speed_constant
         super().__init__('openai_api_node')
         
         # Initialize OpenAI client
@@ -62,16 +63,19 @@ class OpenAIAPINode(Node):
         """Initialize the conversation with system context"""
         system_message = {
             "role": "system",
-            "content": """You are a small robot navigating in a Webots simulation environment. Your goal is to get close to a yellow duck without getting too close.
+            "content": """You are a small robot navigating in a Webots simulation environment.
 
 IMPORTANT RULES:
 1. You can GO forward or STOP
-2. You must get close enough to see the duck clearly but not so close that you can't see it entirely
-3. Always explain your decision before giving your command
-4. Use '<GO>' to move forward or '<STOP>' to stop
-5. Consider your previous actions and the current situation
-6. If you're getting too close, STOP. If you need to get closer, GO
-7. Be consistent with your previous decisions unless the situation clearly changes
+2. Your goal is to get close to yellow duck
+3. Visible size of yellow duck must be approximately 90% of the frame size
+4. Always give an estimation of the distance to the yellow duck
+5. Always give an estimation of the visible size of the yellow duck
+6. Always explain your decision before giving your command
+7. Use '<GO>' to move forward or '<STOP>' to stop
+8. Consider your previous actions and the current situation
+9. If you're getting too close, STOP. If you need to get closer, GO
+01. Be consistent with your previous decisions unless the situation clearly changes
 
 Current conversation ID: {conversation_id}""".format(conversation_id=self.robot_state['conversation_id'])
         }
@@ -136,7 +140,7 @@ Remember: You are continuing the same conversation. Consider your previous decis
                 "role": "user",
                 "content": [
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}},
-                    {"type": "text", "text": "What do you see in this frame? Consider your previous actions and the current situation. You can GO forward or STOP. You must get close to yellow duck but not entirely to be able to see it entirely. Explain your decision and add to your answer '<GO>' or '<STOP>'"}
+                    {"type": "text", "text": "What do you see in this frame? Explain your decision and add to your answer '<GO>' or '<STOP>'"}
                 ]
             }
             
@@ -181,26 +185,20 @@ Remember: You are continuing the same conversation. Consider your previous decis
     def control_robot(self, response_text):
         """Control robot based on OpenAI response and return the action taken"""
         command = Twist()
-        action_taken = 'UNKNOWN'
+        action_taken = 'STOP'
         
         if '<GO>' in response_text:
             # Move forward
-            command.linear.x = 0.05
+            command.linear.x = self.linear_speed_constant
             command.angular.z = 0.0
             self.get_logger().info('Moving forward - GO signal received')
             action_taken = 'GO'
-        elif '<STOP>' in response_text:
+        if '<STOP>' in response_text:
             # Stop
             command.linear.x = 0.0
             command.angular.z = 0.0
             self.get_logger().info('Stopping - STOP signal received')
             action_taken = 'STOP'
-        else:
-            # Default behavior - move slowly
-            command.linear.x = 0.01
-            command.angular.z = 0.0
-            self.get_logger().info('Default behavior - no clear GO/STOP signal')
-            action_taken = 'DEFAULT'
         
         # Publish the command
         self.cmd_vel_publisher.publish(command)

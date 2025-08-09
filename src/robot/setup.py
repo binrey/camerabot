@@ -4,7 +4,7 @@ package_name = 'robot'
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
 data_files.append(('share/' + package_name + '/launch', ['launch/sim.py']))
-data_files.append(('share/' + package_name + '/launch', ['launch/openai_api_launch.py']))
+data_files.append(('share/' + package_name + '/launch', ['launch/openai_control_launch.py']))
 data_files.append(('share/' + package_name + '/worlds', ['worlds/my_world.wbt']))
 data_files.append(('share/' + package_name + '/resource', ['resource/my_robot.urdf']))
 data_files.append(('share/' + package_name + '/resource', ['resource/my_robot.rviz']))
@@ -25,7 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'my_robot_driver = robot.my_robot_driver:main',
-            'openai_api = robot.openai_api:main',
+            'openai_control = robot.openai_control:main',
             'talker = robot.talker:main',
             'listener = robot.listener:main',
             'simple_control = robot.simple_control:main',
