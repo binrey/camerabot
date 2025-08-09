@@ -25,7 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'my_robot_driver = robot.my_robot_driver:main',
-            'openai_api = robot.opeai_api:main',
+            'openai_api = robot.openai_api:main',
             'talker = robot.talker:main',
             'listener = robot.listener:main',
             'simple_control = robot.simple_control:main',

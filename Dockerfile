@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     libqt5gui5 \
     libjpeg-dev \
     libpulse0 \
+    python3-pip \
     wget \
     sudo
 
@@ -63,6 +64,10 @@ USER $USERNAME
 WORKDIR /home/$USERNAME/camerabot
 ENV HOME=/home/$USERNAME
 ENV USER=$USERNAME
+
+# Install Python dependencies
+COPY src/robot/requirements.txt /home/$USERNAME/requirements.txt
+RUN pip3 install -r /home/$USERNAME/requirements.txt
 
 # Create a .bashrc entry to automatically source ROS 2 and navigate to workspace
 RUN echo "source /opt/ros/humble/setup.sh" >> ~/.bashrc \

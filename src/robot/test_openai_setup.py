@@ -34,7 +34,7 @@ def test_openai_setup():
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "user", "content": "Say 'Hello World' and end with '<GO>'"}
+                {"role": "user", "content": "write completed version of equation in plain text: 111 + 222 = ?"}
             ],
             max_tokens=50
         )

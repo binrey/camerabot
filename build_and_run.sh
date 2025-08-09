@@ -46,4 +46,4 @@ docker run -it \
   --volume .:/home/$USERNAME/camerabot:rw \
   --user "${USER_UID}:${USER_GID}" \
   ros2_jazzy \
-  bash -c "echo ✅  Done! && echo Next: colcon build && echo source install/local_setup.bash && bash"
+  bash -c "echo ✅  Done! && echo Next: colcon build && source install/local_setup.bash && bash"
