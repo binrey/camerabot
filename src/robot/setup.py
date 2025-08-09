@@ -1,11 +1,13 @@
 from setuptools import setup
 
-package_name = 'my_package'
+package_name = 'robot'
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
-data_files.append(('share/' + package_name + '/launch', ['launch/robot_launch.py']))
+data_files.append(('share/' + package_name + '/launch', ['launch/sim.py']))
+data_files.append(('share/' + package_name + '/launch', ['launch/openai_api_launch.py']))
 data_files.append(('share/' + package_name + '/worlds', ['worlds/my_world.wbt']))
 data_files.append(('share/' + package_name + '/resource', ['resource/my_robot.urdf']))
+data_files.append(('share/' + package_name + '/resource', ['resource/my_robot.rviz']))
 data_files.append(('share/' + package_name, ['package.xml']))
 
 setup(
@@ -13,7 +15,7 @@ setup(
     version='0.0.0',
     packages=[package_name],
     data_files=data_files,
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'openai', 'opencv-python'],
     zip_safe=True,
     maintainer='user',
     maintainer_email='user.name@mail.com',
@@ -22,7 +24,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'my_robot_driver = my_package.my_robot_driver:main',
+            'my_robot_driver = robot.my_robot_driver:main',
+            'openai_api = robot.opeai_api:main',
+            'talker = robot.talker:main',
+            'listener = robot.listener:main',
+            'simple_control = robot.simple_control:main',
         ],
     },
 )

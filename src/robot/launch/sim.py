@@ -9,7 +9,7 @@ from webots_ros2_driver.webots_launcher import WebotsLauncher
 
 
 def generate_launch_description():
-    package_dir = get_package_share_directory('my_package')
+    package_dir = get_package_share_directory('robot')
     robot_description_path = os.path.join(package_dir, 'resource', 'my_robot.urdf')
     rviz_config_path = os.path.join(package_dir, 'resource', 'my_robot.rviz')
 
@@ -24,11 +24,6 @@ def generate_launch_description():
         ]
     )
 
-    obstacle_avoider = Node(
-        package='my_package',
-        executable='obstacle_avoider',
-    )
-
     rviz = Node(
         package='rviz2',
         executable='rviz2',
@@ -36,11 +31,16 @@ def generate_launch_description():
         arguments=['-d', rviz_config_path],
     )
 
+    simple_control = Node(
+        package='robot',
+        executable='simple_control',
+    )
+
     return LaunchDescription([
         webots,
         my_robot_driver,
-        obstacle_avoider,
         rviz,
+        simple_control,
         launch.actions.RegisterEventHandler(
             event_handler=launch.event_handlers.OnProcessExit(
                 target_action=webots,

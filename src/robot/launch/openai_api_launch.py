@@ -8,7 +8,7 @@ from webots_ros2_driver.webots_controller import WebotsController
 
 
 def generate_launch_description():
-    package_dir = get_package_share_directory('my_package')
+    package_dir = get_package_share_directory('robot')
     robot_description_path = os.path.join(package_dir, 'resource', 'my_robot.urdf')
     rviz_config_path = os.path.join(package_dir, 'resource', 'my_robot.rviz')
     webots = WebotsLauncher(
@@ -23,7 +23,7 @@ def generate_launch_description():
     )
 
     openai_api_node = Node(
-        package='my_package',
+        package='robot',
         executable='openai_api',
     )
 
