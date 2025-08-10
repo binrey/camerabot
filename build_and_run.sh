@@ -3,6 +3,7 @@ set -euo pipefail
 
 ros_distro=$1
 container_name=$2
+headless=${3:-false}  # Default to false (GUI mode)
 
 # Stop and remove existing container
 echo "🛑 Stopping existing container..."
@@ -29,7 +30,18 @@ docker build \
   --build-arg USERNAME=${USERNAME} \
   -t ros2_jazzy .
 
-xhost +local:docker
+# Set up X11 forwarding only if not in headless mode
+if [ "$headless" != "true" ]; then
+  echo "🖥️  Setting up X11 forwarding for GUI mode..."
+  xhost +local:docker
+  X11_ARGS="--env QT_X11_NO_MITSHM=1 \
+  --device /dev/dri \
+  --env DISPLAY=$DISPLAY \
+  --volume /tmp/.X11-unix:/tmp/.X11-unix"
+else
+  echo "🚫 Running in headless mode (no GUI support)"
+  X11_ARGS=""
+fi
 
 echo "🚀 Starting ROS 2 container..."
 # Run the container with network configuration
@@ -39,10 +51,7 @@ docker run -it \
   --interactive \
   --network host \
   --env ROS_DOMAIN_ID=${ROS_DOMAIN_ID} \
-  --env QT_X11_NO_MITSHM=1 \
-  --device /dev/dri \
-  --env DISPLAY=$DISPLAY \
-  --volume /tmp/.X11-unix:/tmp/.X11-unix \
+  $X11_ARGS \
   --volume .:/home/$USERNAME/camerabot:rw \
   --user "${USER_UID}:${USER_GID}" \
   ros2_jazzy \
