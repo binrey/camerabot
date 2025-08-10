@@ -3,7 +3,8 @@ set -euo pipefail
 
 ros_distro=$1
 container_name=$2
-headless=${3:-false}  # Default to false (GUI mode)
+image_name=$3
+headless=${4:-false}  # Default to false (GUI mode)
 
 # Stop and remove existing container
 echo "🛑 Stopping existing container..."
@@ -25,10 +26,11 @@ echo "🔨 Building ROS 2 Docker image for" $ros_distro "..."
 # Build the Docker image with platform with specification and build args
 docker build \
   --build-arg ROS_DISTRO=$ros_distro \
+  --build-arg HEADLESS=$headless \
   --build-arg USER_UID=${USER_UID} \
   --build-arg USER_GID=${USER_GID} \
   --build-arg USERNAME=${USERNAME} \
-  -t ros2_jazzy .
+  -t $image_name .
 
 # Set up X11 forwarding only if not in headless mode
 if [ "$headless" != "true" ]; then
