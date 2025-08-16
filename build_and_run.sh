@@ -55,6 +55,7 @@ docker run -it \
   --env ROS_DOMAIN_ID=${ROS_DOMAIN_ID} \
   $X11_ARGS \
   --volume .:/home/$USERNAME/camerabot:rw \
-  --user "${USER_UID}:${USER_GID}" \
+  --volume /dev:/dev \
+  --privileged \
   $image_name \
   bash -c "echo ✅  Done! && echo Next: colcon build && bash"
