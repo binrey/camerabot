@@ -1,1 +1,1 @@
-./build_and_run.sh jazzy-ros-base camerabot
+./build_and_run.sh ros:humble-ros-base camerabot camerabot true
