@@ -7,11 +7,19 @@ import os
 import time
 import glob
 import numpy as np
+from ament_index_python.packages import get_package_share_directory
 
-curpath = os.path.realpath(__file__)
-thisPath = os.path.dirname(curpath)
-with open(thisPath + '/config.yaml', 'r') as yaml_file:
-    f = yaml.safe_load(yaml_file)
+# Get the path to the package and load config
+package_path = get_package_share_directory('robot')
+config_path = os.path.join(package_path, 'resource', 'config.yaml')
+
+try:
+    with open(config_path, 'r') as yaml_file:
+        f = yaml.safe_load(yaml_file)
+except FileNotFoundError:
+    print(f"Warning: Could not find config file at {config_path}")
+    print(f"Package path: {package_path}")
+    f = {}  # Provide empty config as fallback
 
 class ReadLine:
 	def __init__(self, s):
