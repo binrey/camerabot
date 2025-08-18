@@ -1,4 +1,4 @@
-ARG ROS_DISTRO="osrf/ros:humble-desktop"
+ARG ROS_DISTRO="osrf/ros:humble-desktop-arm64"
 ARG HEADLESS=false
 FROM $ROS_DISTRO
 
@@ -14,7 +14,9 @@ RUN apt-get update && apt-get install -y \
     gnupg2 \
     python3-pip \
     wget \
-    sudo
+    sudo \
+    python3-cv-bridge \
+    python3-opencv
 
 # Conditionally install graphics and Webots packages based on HEADLESS argument
 RUN if [ "$HEADLESS" = "false" ]; then \
@@ -71,13 +73,14 @@ WORKDIR /home/$USERNAME/camerabot
 ENV HOME=/home/$USERNAME
 ENV USER=$USERNAME
 
-# Install Python dependencies
+# Copy requirements.txt and install Python dependencies
 COPY src/robot/requirements.txt /home/$USERNAME/requirements.txt
-RUN pip3 install -r /home/$USERNAME/requirements.txt
 
-# Create a .bashrc entry to automatically source ROS 2 and navigate to workspace
+# Source ROS 2 and install Python dependencies
 RUN echo "source /opt/ros/humble/setup.sh" >> ~/.bashrc \
-    && echo "cd /home/$USERNAME/camerabot" >> ~/.bashrc
+    && echo "cd /home/$USERNAME/camerabot" >> ~/.bashrc \
+    && . /opt/ros/humble/setup.sh \
+    && pip3 install -r /home/$USERNAME/requirements.txt
 
 # Set default command
 CMD ["bash"] 

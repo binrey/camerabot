@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 set -euo pipefail
 
 ros_distro=$1
@@ -46,7 +46,9 @@ else
 fi
 
 echo "🚀 Starting ROS 2 container..."
-# Run the container with network configuration
+echo "📷 Enabling camera access for Raspberry Pi..."
+
+# Run the container with network configuration and camera support
 docker run -it \
   --name $container_name \
   --tty \
@@ -55,6 +57,10 @@ docker run -it \
   --env ROS_DOMAIN_ID=${ROS_DOMAIN_ID} \
   $X11_ARGS \
   --volume .:/home/$USERNAME/camerabot:rw \
-  --user "${USER_UID}:${USER_GID}" \
+  --volume /dev:/dev \
+  --device-cgroup-rule='c 81:* rmw' \
+  --device-cgroup-rule='c 189:* rmw' \
+  --cap-add=SYS_RAWIO \
+  --privileged \
   $image_name \
   bash -c "echo ✅  Done! && echo Next: colcon build && bash"
