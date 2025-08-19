@@ -58,9 +58,10 @@ docker run -it \
   $X11_ARGS \
   --volume .:/home/$USERNAME/camerabot:rw \
   --volume /dev:/dev \
-  --device-cgroup-rule='c 81:* rmw' \
-  --device-cgroup-rule='c 189:* rmw' \
-  --cap-add=SYS_RAWIO \
+  --volume /run/udev:/run/udev:ro \  
+  --device /dev/vchiq:/dev/vchiq \
+  --device /dev/video0:/dev/video0 \
+  --group-add video \
   --privileged \
   $image_name \
   bash -c "echo ✅  Done! && echo Next: colcon build && bash"
