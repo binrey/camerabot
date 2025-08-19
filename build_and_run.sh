@@ -4,7 +4,8 @@ set -euo pipefail
 ros_distro=$1
 container_name=$2
 image_name=$3
-headless=${4:-false}  # Default to false (GUI mode)
+webots=${4:-false}  # Default to false (GUI mode)
+x11=${5:-false}  # Default to false (GUI mode)
 
 # Stop and remove existing container
 echo "🛑 Stopping existing container..."
@@ -26,14 +27,14 @@ echo "🔨 Building ROS 2 Docker image for" $ros_distro "..."
 # Build the Docker image with platform with specification and build args
 docker build \
   --build-arg ROS_DISTRO=$ros_distro \
-  --build-arg HEADLESS=$headless \
+  --build-arg WEBOTS=$webots \
   --build-arg USER_UID=${USER_UID} \
   --build-arg USER_GID=${USER_GID} \
   --build-arg USERNAME=${USERNAME} \
   -t $image_name .
 
 # Set up X11 forwarding only if not in headless mode
-if [ "$headless" != "true" ]; then
+if [ "$x11" != "false" ]; then
   echo "🖥️  Setting up X11 forwarding for GUI mode..."
   xhost +local:docker
   X11_ARGS="--env QT_X11_NO_MITSHM=1 \
@@ -58,9 +59,12 @@ docker run -it \
   $X11_ARGS \
   --volume .:/home/$USERNAME/camerabot:rw \
   --volume /dev:/dev \
-  --volume /run/udev:/run/udev:ro \  
+  --volume /run/udev:/run/udev:ro \
   --device /dev/vchiq:/dev/vchiq \
   --device /dev/video0:/dev/video0 \
+  --device /dev/video1:/dev/video1 \
+  --device /dev/media0:/dev/media0 \
+  --device /dev/media1:/dev/media1 \
   --group-add video \
   --privileged \
   $image_name \

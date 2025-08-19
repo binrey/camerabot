@@ -16,10 +16,11 @@ RUN apt-get update && apt-get install -y \
     wget \
     sudo \
     python3-cv-bridge \
-    python3-opencv
+    python3-opencv \
+    v4l-utils
 
 # Conditionally install graphics and Webots packages based on HEADLESS argument
-RUN if [ "$HEADLESS" = "false" ]; then \
+RUN if [ "$WEBOTS" = "true" ]; then \
         apt-get install -y \
         libgl1 \
         libqt5gui5 \
@@ -29,7 +30,7 @@ RUN if [ "$HEADLESS" = "false" ]; then \
 
 # Conditionally install Webots based on HEADLESS argument
 ARG WEBOTS_VERSION=2025a
-RUN if [ "$HEADLESS" = "false" ]; then \
+RUN if [ "$WEBOTS" = "true" ]; then \
         WEBOTS_URL="https://github.com/cyberbotics/webots/releases/download/R${WEBOTS_VERSION}/webots_${WEBOTS_VERSION}_amd64.deb" && \
         wget ${WEBOTS_URL} -O /tmp/webots.deb && \
         apt-get install -y /tmp/webots.deb && \
@@ -37,7 +38,7 @@ RUN if [ "$HEADLESS" = "false" ]; then \
     fi
 
 # Conditionally install Webots ROS2 package based on HEADLESS argument
-RUN if [ "$HEADLESS" = "false" ]; then \
+RUN if [ "$WEBOTS" = "true" ]; then \
         apt-get update && apt-get install -y ros-humble-webots-ros2; \
     fi
 
