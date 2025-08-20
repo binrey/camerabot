@@ -1,4 +1,4 @@
-ARG ROS_DISTRO="osrf/ros:humble-desktop"
+ARG ROS_DISTRO="osrf/ros:humble-desktop-arm64"
 ARG HEADLESS=false
 FROM $ROS_DISTRO
 
@@ -14,10 +14,13 @@ RUN apt-get update && apt-get install -y \
     gnupg2 \
     python3-pip \
     wget \
-    sudo
+    sudo \
+    python3-cv-bridge \
+    python3-opencv \
+    v4l-utils
 
 # Conditionally install graphics and Webots packages based on HEADLESS argument
-RUN if [ "$HEADLESS" = "false" ]; then \
+RUN if [ "$WEBOTS" = "true" ]; then \
         apt-get install -y \
         libgl1 \
         libqt5gui5 \
@@ -27,7 +30,7 @@ RUN if [ "$HEADLESS" = "false" ]; then \
 
 # Conditionally install Webots based on HEADLESS argument
 ARG WEBOTS_VERSION=2025a
-RUN if [ "$HEADLESS" = "false" ]; then \
+RUN if [ "$WEBOTS" = "true" ]; then \
         WEBOTS_URL="https://github.com/cyberbotics/webots/releases/download/R${WEBOTS_VERSION}/webots_${WEBOTS_VERSION}_amd64.deb" && \
         wget ${WEBOTS_URL} -O /tmp/webots.deb && \
         apt-get install -y /tmp/webots.deb && \
@@ -35,7 +38,7 @@ RUN if [ "$HEADLESS" = "false" ]; then \
     fi
 
 # Conditionally install Webots ROS2 package based on HEADLESS argument
-RUN if [ "$HEADLESS" = "false" ]; then \
+RUN if [ "$WEBOTS" = "true" ]; then \
         apt-get update && apt-get install -y ros-humble-webots-ros2; \
     fi
 
@@ -71,13 +74,14 @@ WORKDIR /home/$USERNAME/camerabot
 ENV HOME=/home/$USERNAME
 ENV USER=$USERNAME
 
-# Install Python dependencies
+# Copy requirements.txt and install Python dependencies
 COPY src/robot/requirements.txt /home/$USERNAME/requirements.txt
-RUN pip3 install -r /home/$USERNAME/requirements.txt
 
-# Create a .bashrc entry to automatically source ROS 2 and navigate to workspace
+# Source ROS 2 and install Python dependencies
 RUN echo "source /opt/ros/humble/setup.sh" >> ~/.bashrc \
-    && echo "cd /home/$USERNAME/camerabot" >> ~/.bashrc
+    && echo "cd /home/$USERNAME/camerabot" >> ~/.bashrc \
+    && . /opt/ros/humble/setup.sh \
+    && pip3 install -r /home/$USERNAME/requirements.txt
 
 # Set default command
 CMD ["bash"] 
