@@ -8,7 +8,7 @@ webots=${4:-false}  # Default to false (GUI mode)
 x11=${5:-false}  # Default to false (GUI mode)
 
 # Stop and remove existing container
-echo "ð Stopping existing container..."
+echo "🛑 Stopping existing container..."
 docker stop $container_name 2>/dev/null || true
 docker rm $container_name 2>/dev/null || true
 
@@ -35,19 +35,21 @@ docker build \
 
 # Set up X11 forwarding only if not in headless mode
 if [ "$x11" != "false" ]; then
-  echo "ð¥ï¸  Setting up X11 forwarding for GUI mode..."
+  echo "🖥️  Setting up X11 forwarding for GUI mode..."
   xhost +local:docker
   X11_ARGS="--env QT_X11_NO_MITSHM=1 \
   --device /dev/dri \
-  --env DISPLAY=$DISPLAY \
+  --env DISPLAY=host.docker.internal:0 \
+  --env _XEVENT_TRACE=1 \
+  --env QT_DEBUG_PLUGINS=1 \
   --volume /tmp/.X11-unix:/tmp/.X11-unix"
 else
   echo "🚫 Running in headless mode (no GUI support)"
   X11_ARGS=""
 fi
 
-echo "ð€ Starting ROS 2 container..."
-echo "ð· Enabling camera access for Raspberry Pi..."
+echo "🚀 Starting ROS 2 container..."
+echo "📷 Enabling camera access for Raspberry Pi..."
 
 # Run the container with network configuration and camera support
 docker run -it \
