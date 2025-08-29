@@ -26,11 +26,12 @@ setup(
     entry_points={
         'console_scripts': [
             'my_robot_driver = robot.my_robot_driver:main',
-            'ugv_driver = robot.ugv_driver:main',
             'openai_control = robot.openai_control:main',
+            'ugv_driver = robot.ugv_driver:main',
             'talker = robot.talker:main',
             'listener = robot.listener:main',
             'simple_control = robot.simple_control:main',
+            'camera = robot.camera:main',
         ],
     },
 )
