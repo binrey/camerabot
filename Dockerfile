@@ -1,5 +1,4 @@
-ARG ROS_DISTRO="osrf/ros:humble-desktop-arm64"
-ARG HEADLESS=false
+ARG ROS_DISTRO="osrf/ros:humble-desktop"
 FROM $ROS_DISTRO
 
 # Set environment variables
@@ -7,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG USERNAME
 ARG USER_UID
 ARG USER_GID
+ARG WEBOTS=false
 
 # Install base packages
 RUN apt-get update && apt-get install -y \
@@ -19,27 +19,19 @@ RUN apt-get update && apt-get install -y \
     python3-opencv \
     v4l-utils
 
-# Conditionally install graphics and Webots packages based on HEADLESS argument
+# Conditionally install Webots based on WEBOTS argument
+ARG WEBOTS_VERSION=2025a
 RUN if [ "$WEBOTS" = "true" ]; then \
-        apt-get install -y \
+        apt-get update && apt-get install -y \
         libgl1 \
         libqt5gui5 \
         libjpeg-dev \
-        libpulse0; \
-    fi
-
-# Conditionally install Webots based on HEADLESS argument
-ARG WEBOTS_VERSION=2025a
-RUN if [ "$WEBOTS" = "true" ]; then \
-        WEBOTS_URL="https://github.com/cyberbotics/webots/releases/download/R${WEBOTS_VERSION}/webots_${WEBOTS_VERSION}_amd64.deb" && \
+        libpulse0 \
+        ros-humble-webots-ros2 && \
+        WEBOTS_URL="https://github.com/cyberbotics/webots/releases/download/R${WEBOTS_VERSION}/webots_${WEBOTS_VERSION}_amd64.deb"; \
         wget ${WEBOTS_URL} -O /tmp/webots.deb && \
         apt-get install -y /tmp/webots.deb && \
         rm /tmp/webots.deb; \
-    fi
-
-# Conditionally install Webots ROS2 package based on HEADLESS argument
-RUN if [ "$WEBOTS" = "true" ]; then \
-        apt-get update && apt-get install -y ros-humble-webots-ros2; \
     fi
 
 # Create user and group with proper handling of existing users and groups

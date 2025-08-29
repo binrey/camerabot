@@ -23,7 +23,7 @@ export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
 # docker network create camerabot_network 2>/dev/null || echo "Network already exists"
 
 #  4. Build and run Docker container 
-echo "🔨 Building ROS 2 Docker image for" $ros_distro "..."
+echo "🔨 Building ROS 2 Docker image for" $ros_distro " webots:" $webots " x11:" $x11 "..."
 # Build the Docker image with platform with specification and build args
 docker build \
   --build-arg ROS_DISTRO=$ros_distro \
@@ -34,7 +34,7 @@ docker build \
   -t $image_name .
 
 # Set up X11 forwarding only if not in headless mode
-if [ "$x11" != "false" ]; then
+if [ "$x11" == "true" ]; then
   echo "🖥️  Setting up X11 forwarding for GUI mode..."
   xhost +local:docker
   X11_ARGS="--env QT_X11_NO_MITSHM=1 \
@@ -43,6 +43,7 @@ if [ "$x11" != "false" ]; then
   --env _XEVENT_TRACE=1 \
   --env QT_DEBUG_PLUGINS=1 \
   --volume /tmp/.X11-unix:/tmp/.X11-unix"
+  X11_ARGS="$X11_ARGS --env DISPLAY=$DISPLAY" # added for linux
 else
   echo "🚫 Running in headless mode (no GUI support)"
   X11_ARGS=""
