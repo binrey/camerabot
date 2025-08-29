@@ -23,7 +23,7 @@ export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
 # docker network create camerabot_network 2>/dev/null || echo "Network already exists"
 
 #  4. Build and run Docker container 
-echo "🔨 Building ROS 2 Docker image for" $ros_distro "..."
+echo "🔨 Building ROS 2 Docker image for" $ros_distro " webots:" $webots " x11:" $x11 "..."
 # Build the Docker image with platform with specification and build args
 docker build \
   --build-arg ROS_DISTRO=$ros_distro \
