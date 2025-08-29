@@ -1,1 +1,1 @@
-bash ./build_and_run.sh osrf/ros:humble-desktop camerabot_host camerabot_host false true
+bash ./build_and_run.sh osrf/ros:humble-desktop camerabot_host camerabot_host true true
